@@ -1,73 +1,32 @@
-import pyxel
+import pygame 
+from core.player import *
 
-width, heigth = 160, 120
 
-keys_to_representation = {
-    pyxel.KEY_SPACE: "space",
-    pyxel.KEY_A: "a",
-    pyxel.KEY_D: "d",
-    pyxel.KEY_E: "e",
-    pyxel.KEY_Q: "q",
-    pyxel.KEY_S: "s",
-    pyxel.KEY_W: "w",
-    pyxel.KEY_BACKSPACE: "backspace",
-    pyxel.KEY_ESCAPE: "escape",
-    pyxel.KEY_UP: "up",
-    pyxel.KEY_DOWN: "down",
-    pyxel.KEY_LEFT: "left",
-    pyxel.KEY_RIGHT: "right"
-}
+pygame.init()
 
-class player:
+tamtela = (720, 480)
+tela = pygame.display.set_mode(tamtela)
+pygame.display.set_caption("FISH&FIGHT")
+clock = pygame.time.Clock()
+running = True
 
-    global width
-    global heigth
+while running:
+    # poll for events
+    # pygame.QUIT event means the user clicked X to close your window
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-    def __init__(self):
-        self.pX = width / 2
-        self.pY = heigth / 2
+    # fill the screen with a color to wipe away anything from last frame
+    tela.fill("blue")
     
-    #def draw_player(self):
-        
+    # RENDER YOUR GAME HERE
 
-    def move_player(self):
-        if pyxel.btn(pyxel.KEY_W):
-            self.pY -= 5
-        elif pyxel.btn(pyxel.KEY_S):
-            self.pY += 5
-        elif pyxel.btn(pyxel.KEY_A):
-            self.pX -= 5
-        elif pyxel.btn(pyxel.KEY_D):
-            self.pX += 5
+    movimentacao()
 
+    # flip() the display to put your work on screen
+    pygame.display.flip()
 
+    clock.tick(16)  # limits FPS to 12
 
-class App:
-
-    global width
-    global heigth 
-    
-
-    def __init__(self):
-        pyxel.init(width, heigth, title="Hello Pyxel")
-        pyxel.load("assets/RESOURCE_FILE.pyxres")
-        pyxel.run(self.update, self.draw)
-
-        self.player = player()
-
-    def update(self):
-        if pyxel.btnp(pyxel.KEY_Q):
-            pyxel.quit()
-
-    def draw(self):
-
-        pyxel.cls(0)
-
-        pyxel.blt(player().pX, player().pY, 0, 0, 0, 16, 16)
-
-        player().move_player()
-
-        
-        
-
-App()
+pygame.quit()
