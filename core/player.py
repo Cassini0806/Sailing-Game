@@ -1,4 +1,5 @@
 import pygame
+#from main import WIDTH, HEIGHT
 
 pygame.init()
 screen = pygame.display.set_mode((720, 480))
@@ -20,7 +21,7 @@ class player:
         sprite = pygame.transform.scale(sprite, (16*3, 16*3))
         return sprite
 
-    # Criamos uma tabela (lista) de sprites
+    # Cria uma matriz (lista) de sprites, cada linha é uma direção e cada coluna um frame da animação
     sprites = [
             [
                 get_sprite(sprite_sheet, 0, 0, 16, 16),
@@ -43,10 +44,10 @@ class player:
     tabela = [0,1,2,3]
 
     # Posição do sprite atual
-    table = 0
-    current_sprite = 0
-    x, y = 100, 100
-    speed = 8
+    table = 0 #Linha atual
+    current_sprite = 0 #Coluna atual
+    x, y = 100, 100 #Coordenadas Player
+    speed = 8 #Velocidade do Player(tornar modificavel pela gameplay futuramente)
 
     def navegar():
         keys = pygame.key.get_pressed()
@@ -67,12 +68,6 @@ class player:
             player.table -= player.table + 1 
             player.table *= -1
 
-def movimentacao():
-    player.navegar()
-    # Desenha o sprite atual
-    screen.blit(player.sprites[player.table][player.current_sprite], (player.x, player.y))
-    # Alterna o sprite para animar (simplesmente trocando o índice)
-    player.current_sprite = (player.current_sprite + 1) % len(player.sprites[player.table])
 
 
 
