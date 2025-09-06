@@ -1,0 +1,69 @@
+meu_jogo/
+│── main.py              # Ponto de entrada do jogo
+│── settings.py          # Configurações globais
+│── assets/              # Imagens, sons, fontes
+│── data/                # Salvamentos, arquivos JSON
+│── core/
+│   ├── world.py         # Geração procedural do mundo
+│   ├── player.py        # Player: barco, inventário, status
+│   ├── enemy.py         # Inimigos: IA, spawn, atributos
+│   ├── items.py         # Itens: pesca, loot, comércio
+│   ├── quests.py        # Sistema de quests e missões
+│   ├── economy.py       # Compra e venda
+│   ├── ui.py            # Interface (menus, inventário, HUD)
+│   ├── weather.py       # Clima e ciclo Dia/Noite
+│   └── save_load.py     # Sistema de salvamento
+
+import pygame
+from settings import *
+from core.world import World
+from core.player import Player
+from core.enemy import EnemyManager
+from core.weather import Weather
+from core.ui import UI
+
+pygame.init()
+screen = pygame.display.set_mode((LARGURA, ALTURA))
+clock = pygame.time.Clock()
+
+# Instâncias principais
+world = World()
+player = Player(world.spawn_point)
+enemies = EnemyManager(world)
+weather = Weather()
+ui = UI(player)
+
+rodando = True
+while rodando:
+    # --- Eventos ---
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            rodando = False
+
+    # --- Atualização ---
+    player.update()
+    enemies.update(player)
+    world.update()
+    weather.update()
+    
+    # --- Desenho ---
+    screen.fill((0, 0, 0))
+    world.draw(screen)
+    enemies.draw(screen)
+    player.draw(screen)
+    ui.draw(screen)
+    weather.draw_overlay(screen)
+    
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
+
+
+# # Limita a câmera dentro do mundo
+    # camera_x = max(0, min(camera_x, WORLD_WIDTH - WIDTH))
+    # camera_y = max(0, min(camera_y, WORLD_HEIGHT - HEIGHT))
+
+  # Mantém o player dentro do mundo
+    # player_x = max(0, min(player.x, WORLD_WIDTH - 16))
+    # player_y = max(0, min(player.y, WORLD_HEIGHT - 16))

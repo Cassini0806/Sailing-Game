@@ -8,7 +8,7 @@ from perlin_noise import PerlinNoise
 #Configurações iniciais
 
 width, heigh = 960, 640
-tile_size = 16
+tile_size = 48
 chunk_size = 8
 map_width = int(width / chunk_size)
 map_heigth = int(heigh / chunk_size)
@@ -27,11 +27,7 @@ sprite_sheet = pygame.image.load("assets/tilemap.png").convert_alpha()
 #Geração do terreno
 class terrain:
 
-    def __init__(self):
-        pass    
-
     # Função para cortar um sprite da sprite sheet
-    #@staticmethod
     def get_sprite(sheet, x, y, width, height):
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)  # Permite transparência
         sprite.blit(sheet, (0, 0), (x, y, width, height))  # Copia a parte desejada
@@ -41,11 +37,11 @@ class terrain:
     # Cria uma matriz (lista) de sprites, cada linha é uma direção e cada coluna um frame da animação
     sprites = [
             [get_sprite(sprite_sheet, 0, 0, 16, 16)],
-            [get_sprite(sprite_sheet, 0, 16, 16, 16)],
-            [get_sprite(sprite_sheet, 0, 32, 16, 16)],   
+            [get_sprite(sprite_sheet, 16, 16, 16, 16)],
+            [get_sprite(sprite_sheet, 0, 32, 16, 16), get_sprite(sprite_sheet, 0, 48, 16, 16), get_sprite(sprite_sheet, 16, 48, 16, 16), get_sprite(sprite_sheet, 32, 48, 16, 16)],
         ]
 
-    #@staticmethod
+    #Obrigado @DaFluffyPotato (Thank you @DaFluffyPotato)
     def gera_chunk(seed, x, y):
         noise = PerlinNoise(octaves=6, seed=seed)
         scale = 160.0  # controla o "zoom" no mapa; Controla a densidade do ruído. Aumente se tudo estiver “granulado”; diminua se estiver “liso demais”.
@@ -64,16 +60,24 @@ class terrain:
                 # normaliza para [0, 1]
                 
                 # Define tipos de tiles com base na altura
-                tile_type = 0
-                if h > 0.65:
-                    tile_type = 2
+                tile_type = 0 #agua
+                if h > 0.63:
+                    tile_type = 2 #grama
                 elif h > 0.6:
-                    tile_type = 1
-                if tile_type != 0:
-                    chunk_tiles.append([[target_x,target_y],tile_type])
+                    tile_type = 1 #areia
+
+                tree = 0 
+                chance = random.randint(0,9)
+                if tile_type >= 1 and chance < 3:
+                    tree = 1
+                elif tile_type >= 1 and chance < 2:
+                    tree = 2
+                elif tile_type >= 1 and chance < 1:
+                    tree = 3    
+                if tile_type != 0: 
+                    chunk_tiles.append([[target_x,target_y],tile_type, tree])
         return chunk_tiles
 
-    #@staticmethod
     def desenha_mundo(seed, screen, cx, cy, WIDTH, HEIGHT):
         # calcula quantos tiles cabem na tela
         tiles_x = WIDTH // tile_size + 2
@@ -83,27 +87,6 @@ class terrain:
         start_x = cx // tile_size
         start_y = cy // tile_size
 
-        # for y in range(start_y, start_y + tiles_y):
-        #     for x in range(start_x, start_x + tiles_x):
-        #         # target_x = x + int(10/chunk_size * tile_size)
-        #         # target_y = y + int(10/chunk_size * tile_size)
-        #         # target_chunck = str(x) + ';' + str(y)
-        #         target_chunk = str(x // chunk_size) + ';' + str(y // chunk_size)
-
-        #         if target_chunck not in game_map:
-        #             game_map[target_chunck] = terrain.gera_chunk(seed, target_x, target_y)
-        #         for pos, tile in game_map[target_chunck]:
-        #             tx, ty = pos  # posição (x,y) do tile no mundo
-        #             if tile == 0:
-        #                 sprite = terrain.sprites[0][0] #Mar
-        #             elif tile == 1:
-        #                 sprite = terrain.sprites[1][0] #Praia
-        #             elif tile == 2:
-        #                 sprite = terrain.sprites[2][0] #Grama
-        #             else:
-        #                 pass
-        #            screen.blit(sprite, (tx*tile_size,ty*tile_size))# Desenha o sprite atual
-
         for y in range(start_y, start_y + tiles_y):
                 for x in range(start_x, start_x + tiles_x):
                     target_chunk = str(x // chunk_size) + ';' + str(y // chunk_size)
@@ -111,29 +94,18 @@ class terrain:
                     if target_chunk not in game_map:
                         game_map[target_chunk] = terrain.gera_chunk(seed, x // chunk_size, y // chunk_size)
 
-                    for pos, tile in game_map[target_chunk]:
+                    for pos, tile, tree in game_map[target_chunk]:
                         tx, ty = pos
                         if tx == x and ty == y:  # só desenha o tile certo
                             sprite = terrain.sprites[tile][0]
                             screen.blit(sprite, (tx * tile_size - cx, ty * tile_size - cy))
+                            # Se for grama e tiver árvore
+                            if tile >= 1 and tree == 1:
+                                screen.blit(terrain.sprites[2][1], (tx * tile_size - cx, ty * tile_size - cy))
+                            if tile >= 1 and tree == 2:
+                                screen.blit(terrain.sprites[2][2], (tx * tile_size - cx, ty * tile_size - cy))
+                            if tile >= 1 and tree == 3:
+                                screen.blit(terrain.sprites[2][3], (tx * tile_size - cx, ty * tile_size - cy))
 
-# ct = [[[x,y],t]]
-
-def main():
-    clock = pygame.time.Clock()
-    seed = random.randint(0, 1000)
-
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        terrain.desenha_mundo(seed)
-        pygame.display.flip()
-        clock.tick(30)
-
-    pygame.quit()
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

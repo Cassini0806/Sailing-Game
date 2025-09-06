@@ -1,7 +1,7 @@
 import pygame 
+import random
 from core.player import *
 from core.terrain import *
-
 
 pygame.init()
 
@@ -14,8 +14,7 @@ pygame.display.set_caption("FISH&FIGHT")
 clock = pygame.time.Clock()
 running = True
 
-# Mundo maior que a tela
-WORLD_WIDTH, WORLD_HEIGHT = 2000, 2000
+seed = random.randint(0, 1000)
 
 cx = player.x -  WIDTH // 2
 cy = player.y - HEIGHT // 2
@@ -36,9 +35,12 @@ def movimentacao():
 
     player.navegar()#Movimenta o jogador
     screen.blit(player.sprites[player.table][player.current_sprite], (player_x - camera_x, player_y - camera_y,))# Desenha o sprite atual
-    player.current_sprite = (player.current_sprite + 1) % len(player.sprites[player.table])# Alterna o sprite para animar (simplesmente trocando o índice)
+    #player.current_sprite = (player.current_sprite + 1) % len(player.sprites[player.table])# Alterna o sprite para animar (simplesmente trocando o índice)
 
-seed = random.randint(0, 1000)
+def debug():
+    font = pygame.font.SysFont(None, 28)
+    text = font.render(f"Seed: ({seed}) | fps: ({int(clock.get_fps())}) | Plr: ({player.x}, {player.y}) | Cam: ({cx}, {cy}) ", True, (255, 255, 0))
+    screen.blit(text, (10, 10))
 
 while running:
     # poll for events
@@ -53,10 +55,11 @@ while running:
     terrain.desenha_mundo(seed, tela, cx, cy, WIDTH, HEIGHT)
 
     movimentacao()
+    debug()
 
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(16)  # limits FPS to 12
-
+    clock.tick(60)  # limits FPS to 60
+    
 pygame.quit()

@@ -9,11 +9,6 @@ sprite_sheet = pygame.image.load("assets/boat.png").convert_alpha()
 
 class player:
 
-    global sprite_sheet
-
-    def __init__(self):
-        pass
-
     # Função para cortar um sprite da sprite sheet
     def get_sprite(sheet, x, y, width, height):
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)  # Permite transparência
